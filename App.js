@@ -8,6 +8,51 @@ import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
 import Paho from "paho-mqtt";
 
+const client = new Paho.Client(
+  mqtt_server,
+  Number(mqtt_port),
+  "flight-monitor-" + parseInt(Math.random() * 100)
+);
+
+function subscribeTopics () {
+
+  client.subscribe("/rocket/telemetry/altitude");
+  client.subscribe("/rocket/telemetry/altitude/max");
+
+  client.subscribe("/rocket/telemetry/acceleration/x");
+  client.subscribe("/rocket/telemetry/acceleration/y");
+  client.subscribe("/rocket/telemetry/acceleration/z");
+
+  client.subscribe("/rocket/telemetry/rotation/x");
+  client.subscribe("/rocket/telemetry/rotation/y");
+  client.subscribe("/rocket/telemetry/rotation/z");
+
+  client.subscribe("/rocket/parachute/deploy");
+}
+
+function onFailure() {
+  console.log("Failed to connect");
+}
+
+function onConnectionLost(responseObject) {
+  console.log("Connection Lost" + responseObject);
+}
+
+function deployParachute() {
+  client.connect({
+    onSuccess: function () {
+      const message = new Paho.Message("1");
+      message.destinationName = "/rocket/parachute/deploy";
+      client.send(message);
+      console.log("deploying parachute");
+  },
+    onFailure: onFailure,
+    userName: mqtt_username,
+    password: mqtt_password,
+    useSSL: true,
+  });
+}
+
 export default function App() {
 
   const [connected, setConnected] = useState(false);
@@ -23,56 +68,23 @@ export default function App() {
   const [rotationY, setRotationY] = useState(0.0);
   const [rotationZ, setRotationZ] = useState(0.0);
 
-  const client = new Paho.Client(
-    mqtt_server,
-    Number(mqtt_port),
-    "flight-monitor-" + parseInt(Math.random() * 100)
-  );
-
   const mqtt_options = {
-    onSuccess: subscribeTopics,
+    onSuccess: onConnect,
     onFailure: onFailure,
     userName: mqtt_username,
     password: mqtt_password,
     useSSL: true,
   };
 
-  if (!connected)
-  {
-    client.connect(mqtt_options);
-    client.onConnectionLost = onConnectionLost;
-    client.onMessageArrived = onMessage;
-  }
-
-  function subscribeTopics () {
+  function onConnect() {
     console.log("connected")
     setConnected(true);
-
-    client.subscribe("/rocket/telemetry/altitude");
-    client.subscribe("/rocket/telemetry/altitude/max");
-
-    client.subscribe("/rocket/telemetry/acceleration/x");
-    client.subscribe("/rocket/telemetry/acceleration/y");
-    client.subscribe("/rocket/telemetry/acceleration/z");
-
-    client.subscribe("/rocket/telemetry/rotation/x");
-    client.subscribe("/rocket/telemetry/rotation/y");
-    client.subscribe("/rocket/telemetry/rotation/z");
-
-    client.subscribe("/rocket/parachute/deploy");
-  }
-
-  function onFailure() {
-    console.log("Failed to connect");
-  }
-
-  function onConnectionLost(responseObject) {
-    console.log("Connection Lost" + responseObject);
+    subscribeTopics ();
   }
 
   function onMessage(message) {
     //console.log('Topic: ' + message.destinationName + ", Message: " + message.payloadString);
-
+  
     switch (message.destinationName) {
       case "/rocket/telemetry/altitude":
         setAltitude(parseFloat(message.payloadString));
@@ -101,19 +113,11 @@ export default function App() {
     };
   }
 
-  function deployParachute() {
-    client.connect({
-      onSuccess: function () {
-        const message = new Paho.Message("1");
-        message.destinationName = "/rocket/parachute/deploy";
-        client.send(message);
-        console.log("deploying parachute");
-    },
-      onFailure: onFailure,
-      userName: mqtt_username,
-      password: mqtt_password,
-      useSSL: true,
-    });
+  if (!connected)
+  {
+    client.connect(mqtt_options);
+    client.onConnectionLost = onConnectionLost;
+    client.onMessageArrived = onMessage;
   }
 
   return (
