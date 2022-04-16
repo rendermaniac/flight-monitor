@@ -1,9 +1,18 @@
+import 'react-native-gesture-handler';
 // based on https://snack.expo.dev/@rizwanamjad/mqtt
 
 import {mqtt_username, mqtt_password, mqtt_server, mqtt_port} from 'mqtt_config';
 
 import * as React from "react";
 import { useState } from "react";
+
+// https://www.brainstormcreative.co.uk/react-native-expo/how-to-set-up-expo-app-navigation-using-react-navigation/
+// https://reactnavigation.org/docs/material-top-tab-navigator
+// note this needs npm install react-native-reanimated@~2.2.0
+// also add "react-native-reanimated/plugin" to the end of babel.config.js
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 
 import Paho from "paho-mqtt";
@@ -13,6 +22,8 @@ const client = new Paho.Client(
   Number(mqtt_port),
   "flight-monitor-" + parseInt(Math.random() * 100)
 );
+
+const Tab = createMaterialTopTabNavigator();
 
 function subscribeTopics () {
 
@@ -121,17 +132,36 @@ export default function App() {
   }
 
   return (
+    <NavigationContainer>
+    <Tab.Navigator>
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
+    </Tab.Navigator>
+    </NavigationContainer>
+  );
+}
+
+function HomeScreen({ navigation }) {
+  return (
     <View style={styles.container}>
-      <Text>Altitude is: {Number(altitude).toFixed(2)} </Text>
-      <Text>Max Altitude is: {Number(maxAltitude).toFixed(2)} </Text>
+      <Text>Altitude is: 1.0 {/* Number(altitude).toFixed(2)*/} </Text> 
+      {/* <Text>Max Altitude is: {Number(maxAltitude).toFixed(2)} </Text>
       <Text>Acceleration is: {Number(accelerationX).toFixed(2)} {Number(accelerationY).toFixed(2)} {Number(accelerationZ).toFixed(2)} </Text>
-      <Text>Rotation is: {Number(rotationX).toFixed(2)} {Number(rotationY).toFixed(2)} {Number(rotationZ).toFixed(2)} </Text>
+      <Text>Rotation is: {Number(rotationX).toFixed(2)} {Number(rotationY).toFixed(2)} {Number(rotationZ).toFixed(2)} </Text> */}
 
       <TouchableOpacity onPress={deployParachute} style={styles.button}>
         <Text>Deploy Parachute!</Text>
       </TouchableOpacity>
     </View>
   )
+}
+
+function SettingsScreen({ navigation }) {
+  return (
+    <View style={styles.container}>
+      <Text>This is the Settings page</Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
