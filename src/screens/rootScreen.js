@@ -14,7 +14,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import { HomeScreen } from '@screens/homeScreen';
 import { SettingsScreen } from '@screens/settingsScreen';
 
-import { mqtt_connect } from '../mqtt';
+import { mqtt_connect, mqtt_disconnect } from '../mqtt';
 
 import { useSetRecoilState } from 'recoil';
 import { altitudeAtom, maxAltitudeAtom, accelerationAtom, rotationAtom } from '../atoms';
@@ -49,6 +49,7 @@ export function RootScreen() {
 
     useEffect(() => {
         mqtt_connect(onMessage);
+        return mqtt_disconnect;
       }, []);
 
     return (

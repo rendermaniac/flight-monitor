@@ -1,6 +1,6 @@
 import * as React from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
-import { Altitude, MaxAltitude, Acceleration, Rotation } from '@components/sensors';
+import { Altitude, AltitudeChart, MaxAltitude, Acceleration, Rotation } from '@components/sensors';
 import { deployParachute } from '../mqtt';
 
 export function HomeScreen({ navigation }) {
@@ -8,6 +8,7 @@ export function HomeScreen({ navigation }) {
     return (
       <View>
         <Altitude/>
+        <AltitudeChart/>
         <MaxAltitude/>
         <Acceleration/>
         <Rotation/>

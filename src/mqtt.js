@@ -45,6 +45,11 @@ export function mqtt_connect(onMessage) {
     client.onMessageArrived = onMessage;
 }
 
+export function mqtt_disconnect() {
+    client.disconnect();
+    console.log("disconnected");
+}
+
 export function deployParachute() {
     client.connect({
       onSuccess: function () {
