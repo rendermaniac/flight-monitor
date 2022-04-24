@@ -1,8 +1,5 @@
 import 'react-native-gesture-handler';
 
-import { useEffect } from "react";
-import { StyleSheet } from "react-native";
-
 // https://www.brainstormcreative.co.uk/react-native-expo/how-to-set-up-expo-app-navigation-using-react-navigation/
 // https://reactnavigation.org/docs/material-top-tab-navigator
 // note this needs npm install react-native-reanimated@~2.2.0
@@ -11,62 +8,27 @@ import { StyleSheet } from "react-native";
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
-import { HomeScreen } from '@screens/homeScreen';
+import { ControlsScreen } from '@screens/controlsScreen';
+import { AltitudeScreen } from '@screens/altitudeScreen';
+import { AccelerationScreen } from '@screens/accelerationScreen';
+import { RotationScreen } from '@screens/rotationScreen';
 import { SettingsScreen } from '@screens/settingsScreen';
 
-import { mqtt_connect, mqtt_disconnect } from '../mqtt';
-
-import { useSetRecoilState } from 'recoil';
-import { altitudeAtom, maxAltitudeAtom, accelerationAtom, rotationAtom } from '../atoms';
+import styles from "../styles";
 
 const Tab = createMaterialTopTabNavigator();
 
 export function RootScreen() {
 
-    const setAltitude = useSetRecoilState(altitudeAtom);
-    const setMaxAltitude = useSetRecoilState(maxAltitudeAtom);
-    const setAcceleration = useSetRecoilState(accelerationAtom);
-    const setRotation = useSetRecoilState(rotationAtom);
-
-    function onMessage(message) {
-        //console.log('Topic: ' + message.destinationName + ", Message: " + message.payloadString);
-    
-        switch (message.destinationName) {
-            case "/rocket/telemetry/altitude":
-            setAltitude(parseFloat(message.payloadString));
-            break;
-            case "/rocket/telemetry/altitude/max":
-            setMaxAltitude(parseFloat(message.payloadString));
-            break;
-            case "/rocket/telemetry/acceleration":
-            setAcceleration(JSON.parse(message.payloadString));
-            break;
-            case "/rocket/telemetry/rotation":
-            setRotation(JSON.parse(message.payloadString));
-            break;
-        };
-    }
-
-    useEffect(() => {
-        mqtt_connect(onMessage);
-        return mqtt_disconnect;
-      }, []);
-
     return (
       <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Navigator style={styles.tabnavigator}>
+        <Tab.Screen name="Controls" component={ControlsScreen} />
+        <Tab.Screen name="Altitude" component={AltitudeScreen} />
+        {/* <Tab.Screen name="Acceleration" component={AccelerationScreen} />
+        <Tab.Screen name="Rotation" component={RotationScreen} /> */}
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
       </NavigationContainer>
     );
   }
-  
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#fff",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-  })

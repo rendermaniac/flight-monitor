@@ -1,66 +1,55 @@
 // based on https://snack.expo.dev/@rizwanamjad/mqtt
 
 import Paho from "paho-mqtt";
-import {mqtt_username, mqtt_password, mqtt_server, mqtt_clientid} from 'mqtt_config';
+import * as SecureStore from 'expo-secure-store';
 
-const client = new Paho.Client(
-    mqtt_server,
-    Number(8884), // this has to be a port using websockets
-    mqtt_clientid + parseInt(Math.random() * 100)
-  );
+export const mqtt_broker_key = "mqtt_broker";
+export const mqtt_username_key = "mqtt_username";
+export const mqtt_password_key = "mqtt_password";
 
-export function onConnect() {
-    console.log("connected")
-    subscribeTopics ();
-}
-  
-export function onFailure() {
-    console.log("Failed to connect");
-}
+export async function getMQTTCredentials() {
+    const broker = await SecureStore.getItemAsync(mqtt_broker_key);
+    const username = await SecureStore.getItemAsync(mqtt_username_key);
+    const password = await SecureStore.getItemAsync(mqtt_password_key);
 
-export function onConnectionLost(responseObject) {
-    console.log("Connection Lost:", responseObject);
-}
+    const settings = {
+        broker: broker,
+        userName: username,
+        password: password,
+    };
+    return settings;
+  }
 
-export const mqtt_options = {
-    onSuccess: onConnect,
-    onFailure: onFailure,
-    userName: mqtt_username,
-    password: mqtt_password,
-    useSSL: true,
-};
+export async function mqtt_connect(
+     onMessage=(message)=>{ console.log('Topic: ' + message.destinationName + ", Message: " + message.payloadString); },
+     onConnect=(client)=>{ console.log("Connected to broker", client); }
+     ) {
 
-export function subscribeTopics () {
-    client.subscribe("/rocket/telemetry/altitude");
-    client.subscribe("/rocket/telemetry/altitude/max");
-    client.subscribe("/rocket/telemetry/acceleration");
-    client.subscribe("/rocket/telemetry/rotation");
+    const mqtt_credentials = await getMQTTCredentials();
+    // console.log("credentials are:", mqtt_credentials);
 
-    client.subscribe("/rocket/parachute/deploy");
-}
+    client = new Paho.Client(
+        mqtt_credentials.broker,
+        Number(8884), // this has to be a port using websockets
+        `flight-monitor-${parseInt(Math.random() * 100)}`
+    );
 
-export function mqtt_connect(onMessage) {
-    client.connect(mqtt_options);
-    client.onConnectionLost = onConnectionLost;
+    client.onConnectionLost = (responseObject)=>{ console.log("Connection lost", responseObject)};
     client.onMessageArrived = onMessage;
+
+    mqtt_option = {
+        onSuccess: ()=>{ onConnect(client) },
+        onFailure: ()=>{ console.log("Failed to connect")},
+        userName: mqtt_credentials.userName,
+        password: mqtt_credentials.password,
+        useSSL: true,
+    }
+
+    client.connect(mqtt_option);
+    return client;
 }
 
-export function mqtt_disconnect() {
+export function mqtt_disconnect(client) {
     client.disconnect();
     console.log("disconnected");
 }
-
-export function deployParachute() {
-    client.connect({
-      onSuccess: function () {
-        const message = new Paho.Message("1");
-        message.destinationName = "/rocket/parachute/deploy";
-        client.send(message);
-        console.log("deploying parachute");
-    },
-      onFailure: onFailure,
-      userName: mqtt_username,
-      password: mqtt_password,
-      useSSL: true,
-    });
-  }

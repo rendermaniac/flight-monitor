@@ -1,14 +1,14 @@
 import * as React from "react";
 import { View } from "react-native";
-import { MQTTLogin } from "../components/login";
-
+import { Rotation } from '@components/sensors';
 import styles from "../styles";
 
-export function SettingsScreen({ navigation }) {
+export function RotationScreen({ navigation }) {
+
     return (
       <View style={styles.container}>
-        <MQTTLogin/>
+        <Rotation/>
       </View>
-    );
+    )
   }
 

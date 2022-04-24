@@ -7,7 +7,8 @@ export default function App() {
 
   return (
     <RecoilRoot>
-    <RootScreen/>
+      <RootScreen/>
     </RecoilRoot>
   );
 }
+
