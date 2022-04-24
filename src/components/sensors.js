@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useReducer } from "react";
-import { Text } from "react-native";
+import { Text, useWindowDimensions } from "react-native";
 import {LineChart} from 'react-native-chart-kit';
 
 import { useRecoilValue } from 'recoil';
@@ -30,46 +30,56 @@ export function Altitude() {
   )
 }
 
-const chartData = { altitude: [0.0] };
+export function MaxAltitude() {
+  const maxAltitude = useRecoilValue(maxAltitudeAtom);
+  return (
+    <Text>Max Altitude: {Number(maxAltitude).toFixed(2)}</Text>
+  )
+}
+
+const chartData = { altitude: [0.0], maxAltitude: [0.0] };
 
 function chartReducer(state, action) {
-  return { altitude: [...state.altitude, action.payload].slice(-20) };
+  switch (action.type) {
+    case "altitude":
+      return { altitude: [...state.altitude, action.payload].slice(-20), maxAltitude: state.maxAltitude }
+    case "maxAltitude":
+      return { altitude: state.altitude, maxAltitude: [...state.maxAltitude, action.payload].slice(-20)}
+    default:
+      return state;
+  }
 }
 
 export function AltitudeChart() {
+
     const altitude = useRecoilValue(altitudeAtom);
+    const maxAltitude = useRecoilValue(maxAltitudeAtom);
+
+    const windowWidth = useWindowDimensions().width;
+    const windowHeight = useWindowDimensions().height;
 
     const [chartAltitude, chartDispatcher] = useReducer(chartReducer, chartData);
 
     useEffect(() => {
-      chartDispatcher({type: 'altitude', payload: altitude})
-      console.log(chartAltitude.altitude);
-    }, [altitude]);
+      chartDispatcher({type: 'altitude', payload: altitude});
+      chartDispatcher({type: 'maxAltitude', payload: maxAltitude});
+    }, [altitude, maxAltitude]);
 
     return (
       <LineChart
       data={{
         datasets: [
-          {
-            data: chartAltitude.altitude,
-          }
+          { data: chartAltitude.altitude, color: () => '#C7EBFF' },
+          { data: chartAltitude.maxAltitude }
         ],
-        legend: ["Altitude"]
       }}
-        width={500}
-        height={220}
+        bezier
+        width={windowWidth}
+        height={windowHeight - 100}
         chartConfig={chartConfig}
         />
     )
 }
-
-
-export function MaxAltitude() {
-    const maxAltitude = useRecoilValue(maxAltitudeAtom);
-    return (
-      <Text>Max Altitude: {Number(maxAltitude).toFixed(2)}</Text>
-    )
-  }
 
 export function Acceleration() {
     const acceleration = useRecoilValue(accelerationAtom);

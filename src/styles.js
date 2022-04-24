@@ -24,6 +24,7 @@ export default StyleSheet.create({
         // justifyContent: "flex-start",
       },
       buttonText: {
+        textAlign: "center",
         fontSize: 20,
         color: '#fff',
       },
