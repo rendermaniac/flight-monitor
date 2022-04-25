@@ -6,6 +6,8 @@ import { mqtt_connect, mqtt_disconnect } from '../mqtt';
 import { useSetRecoilState } from 'recoil';
 import { altitudeAtom, maxAltitudeAtom, accelerationAtom, rotationAtom } from '../atoms';
 
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import styles from "../styles";
 
 export function ControlsScreen({ navigation }) {
@@ -28,7 +30,7 @@ export function ControlsScreen({ navigation }) {
 
     function onMessage(message) {
 
-      console.log('Topic: ' + message.destinationName + ", Message: " + message.payloadString);
+      // console.log('Topic: ' + message.destinationName + ", Message: " + message.payloadString);
     
       switch (message.destinationName) {
           case "/rocket/telemetry/altitude":

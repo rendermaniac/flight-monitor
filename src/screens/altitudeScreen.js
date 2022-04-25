@@ -1,6 +1,6 @@
 import * as React from "react";
 import { View } from "react-native";
-import { Altitude, AltitudeChart, MaxAltitude } from '@components/sensors';
+import { Altitude, AltitudeChart, MaxAltitude } from '@components/altitude';
 
 import styles from "../styles";
 

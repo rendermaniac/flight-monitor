@@ -4,7 +4,7 @@ import { Text, useWindowDimensions } from "react-native";
 import {LineChart} from 'react-native-chart-kit';
 
 import { useRecoilValue } from 'recoil';
-import { altitudeAtom, maxAltitudeAtom, accelerationAtom, rotationAtom } from '../atoms';
+import { altitudeAtom, maxAltitudeAtom } from '../atoms';
 
 const chartConfig = {
   backgroundColor: "#e26a00",
@@ -69,28 +69,13 @@ export function AltitudeChart() {
       <LineChart
       data={{
         datasets: [
-          { data: chartAltitude.altitude, color: () => '#C7EBFF' },
+          { data: chartAltitude.altitude, color: () => "#C7EBFF" },
           { data: chartAltitude.maxAltitude }
         ],
       }}
-        bezier
         width={windowWidth}
-        height={windowHeight - 100}
+        height={windowHeight - 200}
         chartConfig={chartConfig}
         />
     )
 }
-
-export function Acceleration() {
-    const acceleration = useRecoilValue(accelerationAtom);
-    return (
-      <Text>Acceleration: {Number(acceleration[0]).toFixed(2)} {Number(acceleration[1]).toFixed(2)} {Number(acceleration[2]).toFixed(2)}</Text>
-    )
-  }
-  
-export function Rotation() {
-    const rotation = useRecoilValue(rotationAtom);
-    return (
-      <Text>Rotation: {Number(rotation[0]).toFixed(2)} {Number(rotation[1]).toFixed(2)} {Number(rotation[2]).toFixed(2)}</Text>
-    )
-  }

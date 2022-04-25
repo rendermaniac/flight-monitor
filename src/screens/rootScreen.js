@@ -9,9 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 import { ControlsScreen } from '@screens/controlsScreen';
-import { AltitudeScreen } from '@screens/altitudeScreen';
-import { AccelerationScreen } from '@screens/accelerationScreen';
-import { RotationScreen } from '@screens/rotationScreen';
+import { SensorsScreen } from '@screens/sensorsScreen';
 import { SettingsScreen } from '@screens/settingsScreen';
 
 import styles from "../styles";
@@ -24,9 +22,7 @@ export function RootScreen() {
       <NavigationContainer>
       <Tab.Navigator style={styles.tabnavigator}>
         <Tab.Screen name="Controls" component={ControlsScreen} />
-        <Tab.Screen name="Altitude" component={AltitudeScreen} />
-        {/* <Tab.Screen name="Acceleration" component={AccelerationScreen} />
-        <Tab.Screen name="Rotation" component={RotationScreen} /> */}
+        <Tab.Screen name="Sensors" component={SensorsScreen} />
         <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
       </NavigationContainer>
